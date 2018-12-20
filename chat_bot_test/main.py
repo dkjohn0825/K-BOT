@@ -105,7 +105,7 @@ def _crawl_naver_keywords(text):
             return kos_string
 
         else:
-            return now_message+u'\n\n- 💶💲챗봇주요 기능💲💶 - \n 👍떡상 (국내시총 - 떡상한 종목을 보여줍니다.)\n'+'👎떡락 (국내시총 - 떡락한 종목을 보여줍니다.)\n📉뉴스(주식 주요 뉴스 &코스피 &코스닥 정보를 보여줍니다.)\n'
+            return now_message+u'\n\n- 💶💲챗봇주요 기능💲💶 - \n 👍떡상 (국내시총 - 떡상한 종목을 보여줍니다.)\n'+'👎떡락 (국내시총 - 떡락한 종목을 보여줍니다.)\n📉뉴스(주식 주요 뉴스 &코스피 &코스닥 정보를 보여줍니다.)\n🥇추천(상승한 종목 중 랜덤으로 추천합니다)'
 
 def opinion(text):
     global img_url
