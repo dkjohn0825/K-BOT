@@ -169,8 +169,11 @@ def opinion(text):
 
 
 
-
-    info_result = "현재 : " + infos3[0]+ " ( 전일대비 "+ infos3[3] +" "+ infos3[2] + " | "+infos3[5]+infos3[6]+infos3[8]+" )\n"
+    if len(infos3[0])<6:
+        info_result = "현재 : " + infos3[0] + " ( 전일대비 " + infos3[1] + " " + infos3[2] + " | " + infos3[3] + infos3[3] + \
+                      infos3[4] + " )\n"
+    else:
+        info_result = "현재 : " + infos3[0] + " ( 전일대비 "+ infos3[3] +" "+ infos3[2] + " | "+infos3[5]+infos3[6]+infos3[8]+" )\n"
 
 
 
