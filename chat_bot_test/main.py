@@ -15,8 +15,10 @@ from slackclient import SlackClient
 from flask import Flask, request, make_response, render_template
 
 
+
+
 time1 = ""
-img_url=""
+img_url = ""
 # 크롤링 함수 구현하기
 def _crawl_naver_keywords(text):
     global img_url
@@ -86,7 +88,7 @@ def _crawl_naver_keywords(text):
                 elif info[10*i+2][0]=="-":
                     count=0
 
-            return u'코스피 추천 종목입니다.\n\n'+u'\n'.join(keywords)
+            return u'🥇🥈🥉코스피 추천 종목입니다.\n\n'+u'\n'.join(keywords)
 
         elif "뉴스" in text or "코스피" in text or "코스닥" in text:
             kos = []
@@ -111,14 +113,18 @@ def opinion(text):
     global img_url
     opinions=[]
     infos=[]
+    infos2=[]
     opinion_result=""
+    company=""
     options = webdriver.ChromeOptions()
     options.add_argument('headless')
     driver = webdriver.Chrome(r'C:\Users\student\Desktop\chromedriver.exe')
     driver.get("https://finance.naver.com/")
     searchText = driver.find_element_by_id("stock_items")
     searchText.send_keys(text)
+    time.sleep(1)
     searchText.send_keys(Keys.ARROW_DOWN)
+    time.sleep(1)
     searchText.send_keys(Keys.RETURN)
 
     time.sleep(1)
@@ -130,29 +136,46 @@ def opinion(text):
     soup_read = BeautifulSoup(urllib.request.urlopen(url).read(), "html.parser") #게시판용
     soup = BeautifulSoup(urllib.request.urlopen(code).read(), "html.parser") #메인
     a = soup.find_all("div", class_="chart")
+    b = soup.find_all("div",class_="first")
+    c=soup.find_all("div",class_="wrap_company")#company name
+
+
+
+
     for i in a:
         img_url = i.find("img")["src"]
+
+    for i in b:
+        company = i.find("em").get_text().replace("\n","").replace(" ","")
+    company=company.split()
+
+    for i in c:
+        company_name= i.find("h2").get_text()
+
 
     for ul in soup_read.find_all("td", class_="title"):
         opinions.append(ul.get_text().replace("\n",'').replace("\t",''))
 
     for li in soup.find_all("em", class_="no_down"):
         infos.append(li.get_text().replace("\n",' ').split())
-
+    for li in soup.find_all("em", class_="no_up"):
+        infos2.append(li.get_text().replace("\n", ' ').split())
     opinion_result=opinions[0]
-
-    infos2 = []
-    infos2 = list(itertools.chain(*infos))
-    print(infos2)
-    print(img_url)
-
-
-    info_result = "현재 : " + infos2[0]+ " ( 전일대비 "+ infos2[3] +" "+ infos2[2] + " | "+infos2[5]+infos2[6]+infos2[8]+" )\n"
+    infos3 = []
+    if infos:
+        infos3 = list(itertools.chain(*infos))
+    if infos2:
+        infos3 = list(itertools.chain(*infos2))
 
 
 
 
-    return u'🧚주-식-요-정🧚 : "'+opinion_result+'"\n\n'+"검색한 주식 : "+text+'\n'+info_result
+    info_result = "현재 : " + infos3[0]+ " ( 전일대비 "+ infos3[3] +" "+ infos3[2] + " | "+infos3[5]+infos3[6]+infos3[8]+" )\n"
+
+
+
+
+    return u'🧚주식요정의 한마디🧚 : "'+opinion_result+'"\n\n'+"💹검색한 주식 : "+company_name+'\n'+"🏢시가총액 : "+company[0]+" "+company[1]+"\n"+info_result
 
 
 # 이벤트 핸들하는 함수
@@ -161,14 +184,16 @@ def _event_handler(event_type, slack_event):
     global img_url
     if img_url:
         if event_type == "app_mention":
+            channel = slack_event["event"]["channel"]
+            text = slack_event["event"]["text"]
+            keywords = _crawl_naver_keywords(text)
+
             msg = {}
             msg["text"] = "그래프"
             msg["image_url"] = img_url
 
-            channel = slack_event["event"]["channel"]
-            text = slack_event["event"]["text"]
+            time.sleep(1)
 
-            keywords = _crawl_naver_keywords(text)
             sc.api_call(
                 "chat.postMessage",
                 channel=channel,
