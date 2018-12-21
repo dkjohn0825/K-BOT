@@ -16,7 +16,6 @@ from flask import Flask, request, make_response, render_template
 
 
 
-
 time1 = ""
 img_url = ""
 # 크롤링 함수 구현하기
@@ -114,6 +113,7 @@ def opinion(text):
     opinions=[]
     infos=[]
     infos2=[]
+    infos3=[]
     opinion_result=""
     company=""
     options = webdriver.ChromeOptions()
@@ -152,33 +152,24 @@ def opinion(text):
     for i in c:
         company_name= i.find("h2").get_text()
 
+    for li in soup.find_all("em", class_="no_up"):
+        infos2.append(li.get_text().replace("\n", ' ').split())
+
+
+    for li in soup.find_all("div", class_="rate_info"):
+        infos3.append(li.get_text().replace("\n", " ").split())
+    infos3 = list(itertools.chain(*infos3))
+    print(infos3)
+
+    info_result= "현재 : " + infos3[2] + " ( 전일대비 " + infos3[4] + " " + infos3[5] +" "+ infos3[6]+" | " + infos3[7] +" )\n"
+
 
     for ul in soup_read.find_all("td", class_="title"):
         opinions.append(ul.get_text().replace("\n",'').replace("\t",''))
-
-    for li in soup.find_all("em", class_="no_down"):
-        infos.append(li.get_text().replace("\n",' ').split())
-    for li in soup.find_all("em", class_="no_up"):
-        infos2.append(li.get_text().replace("\n", ' ').split())
-    opinion_result=opinions[0]
-    infos3 = []
-    if infos:
-        infos3 = list(itertools.chain(*infos))
-    if infos2:
-        infos3 = list(itertools.chain(*infos2))
+    opinion_result = opinions[0]
 
 
-
-    if len(infos3[0])<6:
-        info_result = "현재 : " + infos3[0] + " ( 전일대비 " + infos3[1] + " " + infos3[2] + " | " + infos3[3] + infos3[3] + \
-                      infos3[4] + " )\n"
-    else:
-        info_result = "현재 : " + infos3[0] + " ( 전일대비 "+ infos3[3] +" "+ infos3[2] + " | "+infos3[5]+infos3[6]+infos3[8]+" )\n"
-
-
-
-
-    return u'🧚주식요정의 한마디🧚 : "'+opinion_result+'"\n\n'+"💹검색한 주식 : "+company_name+'\n'+"🏢시가총액 : "+company[0]+" "+company[1]+"\n"+info_result
+    return u'🧚주식요정의 한마디🧚 : "'+opinion_result+'"\n\n'+"💹검색한 주식 : "+company_name+'\n'+"🏢시가총액 : "+company[0]+" "+company[1]+"\n✔"+info_result
 
 
 # 이벤트 핸들하는 함수
