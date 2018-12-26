@@ -17,7 +17,7 @@
 ---
 ## II. 회고(Retrospective)
 * 어플리케이션 구현 과정에서의 어려움과 문제점
-  - Callback 시 Image 동기화
+  - Callback 호출 시 Image 동기화
   - Image 불러오기
   - Selenium을 이용한 페이지 이동
 ---
